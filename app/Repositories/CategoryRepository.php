@@ -27,4 +27,14 @@ class CategoryRepository
         $category = $this->category->create($data);
         return $category;
     }
+
+    public function update ($data, $category){
+        $category->update($data);
+        return new CategoryResource($category);
+    }
+
+    public function delete ($category) {
+        $category->delete();
+        return new CategoryResource($category);
+    }
 }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseJson;
+use App\Http\Resources\FoodResource;
 use App\Models\Category;
 use App\Services\CategoryService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -28,7 +30,7 @@ class CategoryController extends Controller
             return ResponseJson::error($e->getMessage(),400);
         }
 
-        return ResponseJson::success($result, 200);
+        return $result;
     }
 
 
@@ -47,16 +49,37 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        //
+        try {
+            return new FoodResource($category);
+        } catch(ModelNotFoundException $e) {
+            return ResponseJson::error("Category not found", 404);
+        }
+        catch (\Exception $e) {
+            return ResponseJson::error($e->getMessage(), 400);
+        }
     }
 
     public function update(Request $request, Category $category)
     {
-        //
+        $data = $request->only($this->request);
+
+        try {
+            $result = $this->service->update( $data  , $category) ;
+        } catch (\Exception $e) {
+            return ResponseJson::error($e->getMessage(), 400);
+        }
+
+        return ResponseJson::success($result, 'Success updated category');
     }
 
     public function destroy(Category $category)
     {
-        //
+        try {
+            $result = $this->service->delete($category);
+        } catch (\Exception $e) {
+            return ResponseJson::error($e->getMessage(), 400);
+        }
+
+        return ResponseJson::success($result, 'Success deleted category');
     }
 }
