@@ -13,6 +13,10 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasUuid, HasFactory, Notifiable;
+    protected $primaryKey = 'uuid';
+    protected $keyType = "string";
+    public $incrementing = false;
+
 
     /**
      * The attributes that are mass assignable.
@@ -49,5 +53,10 @@ class User extends Authenticatable
 
         $this->attributes['password'] = Hash::make($pass);
 
+    }
+
+    public function getAvatarAttribute($value)
+    {
+        return $value ? asset('storage/' . $value) : null;
     }
 }
